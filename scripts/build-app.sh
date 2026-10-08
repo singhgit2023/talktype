@@ -20,6 +20,7 @@ cp .build/release/TalkType "${app_path}/Contents/MacOS/TalkType"
 cp Resources/Info.plist "${app_path}/Contents/Info.plist"
 cp Resources/AppIcon.icns "${app_path}/Contents/Resources/AppIcon.icns"
 cp Resources/Sounds/*.wav "${app_path}/Contents/Resources/"
+cp .build/artifacts/sparkle/Sparkle/LICENSE "${app_path}/Contents/Resources/Sparkle-LICENSE.txt"
 sparkle_framework="${PWD}/.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 if [[ ! -d "$sparkle_framework" ]]; then
     print -u2 "Sparkle framework was not resolved by Swift Package Manager."
@@ -28,7 +29,7 @@ fi
 rm -rf "${app_path}/Contents/Frameworks/Sparkle.framework"
 ditto "$sparkle_framework" "${app_path}/Contents/Frameworks/Sparkle.framework"
 if [[ -n "${TALKTYPE_UPDATE_FEED_URL:-}" ]]; then
-    plutil -insert SUFeedURL -string "$TALKTYPE_UPDATE_FEED_URL" "${app_path}/Contents/Info.plist"
+    plutil -replace SUFeedURL -string "$TALKTYPE_UPDATE_FEED_URL" "${app_path}/Contents/Info.plist"
 fi
 ./scripts/setup-signing.sh
 signing_dir="${PWD}/.signing"

@@ -113,11 +113,6 @@ struct AudioWaveform: View, Animatable {
     }
 }
 
-private struct TranscriptWidthKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
-}
-
 private struct AnimatedTranscriptLine: View {
     private struct Word: Identifiable {
         let id: String
@@ -128,43 +123,52 @@ private struct AnimatedTranscriptLine: View {
     let fontSize: Double
     let color: Color
     let animationsEnabled: Bool
-    @State private var contentWidth: CGFloat = 0
-
     private var words: [Word] {
         let parts = text.split(whereSeparator: \.isWhitespace)
-        return parts.enumerated().suffix(18).map { index, part in
+        return parts.enumerated().suffix(36).map { index, part in
             Word(id: "\(index)-\(part)", text: String(part))
         }
     }
 
     var body: some View {
         let visibleWords = words
-        GeometryReader { geometry in
-            HStack(spacing: fontSize * 0.25) {
-                ForEach(visibleWords) { word in
-                    Text(word.text)
-                        .fixedSize()
-                        .transition(animationsEnabled
-                            ? .asymmetric(insertion: .opacity.combined(with: .offset(y: 1.5)), removal: .opacity)
-                            : .identity)
+        ScrollViewReader { scroll in
+            ScrollView(.horizontal) {
+                HStack(spacing: fontSize * 0.25) {
+                    ForEach(visibleWords) { word in
+                        Text(word.text)
+                            .fixedSize()
+                            .id(word.id)
+                            .transition(animationsEnabled
+                                ? .opacity.combined(with: .offset(y: 2))
+                                : .identity)
+                    }
                 }
+                .font(.system(size: fontSize, weight: .medium))
+                .foregroundStyle(color)
+                .frame(height: fontSize * 1.5)
             }
-            .font(.system(size: fontSize, weight: .medium))
-            .foregroundStyle(color)
-            .fixedSize(horizontal: true, vertical: false)
-            .background(GeometryReader { measured in
-                Color.clear.preference(key: TranscriptWidthKey.self, value: measured.size.width)
-            })
-            .offset(x: -max(0, contentWidth - geometry.size.width))
-            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .leading)
-            .clipped()
-            .animation(animationsEnabled ? .spring(response: 0.34, dampingFraction: 0.92) : nil,
-                       value: visibleWords.map(\.id))
-            .animation(animationsEnabled ? .easeInOut(duration: 0.25) : nil, value: contentWidth)
-            .onPreferenceChange(TranscriptWidthKey.self) { contentWidth = $0 }
+            .scrollIndicators(.hidden)
+            .allowsHitTesting(false)
+            .onAppear { scrollToLatest(scroll, word: visibleWords.last, animated: false) }
+            .onChange(of: text) { _, _ in
+                scrollToLatest(scroll, word: words.last, animated: animationsEnabled)
+            }
+            .onChange(of: fontSize) { _, _ in
+                scrollToLatest(scroll, word: words.last, animated: false)
+            }
         }
         .frame(height: fontSize * 1.5)
         .accessibilityLabel(text)
+    }
+
+    private func scrollToLatest(_ scroll: ScrollViewProxy, word: Word?, animated: Bool) {
+        guard let word else { return }
+        if animated {
+            withAnimation(.easeOut(duration: 0.24)) { scroll.scrollTo(word.id, anchor: .trailing) }
+        } else {
+            scroll.scrollTo(word.id, anchor: .trailing)
+        }
     }
 }
 

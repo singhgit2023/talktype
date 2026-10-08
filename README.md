@@ -2,6 +2,8 @@
 
 TalkType is a small native macOS menu bar app for voice typing. It recognizes speech on the Mac, formats text locally, and updates the focused text field as words arrive.
 
+[Download TalkType 0.3.0 for Apple Silicon](https://github.com/singhgit2023/talktype/releases/tag/v0.3.0)
+
 ## Build and open
 
 Requires macOS 14 or later and Xcode Command Line Tools. Run:
@@ -11,7 +13,7 @@ Requires macOS 14 or later and Xcode Command Line Tools. Run:
 open dist/TalkType.app
 ```
 
-The first build creates a persistent **TalkType Local Code Signing** certificate in `.signing/TalkType.keychain-db`. The build script uses it again for future updates and verifies the signed app. Keep the `.signing` directory private and backed up. It contains a keychain and its password, is ignored by Git, and is never copied into the app bundle. Changing or losing that certificate changes the app's signing identity and may make macOS ask for permissions again. This self-signed identity is intended for local use; public distribution needs Apple Developer ID signing and notarization.
+The first build creates a persistent **TalkType Local Code Signing** certificate in `.signing/TalkType.keychain-db`. The build script uses it again for future updates and verifies the signed app. Keep the `.signing` directory private and backed up. It contains a keychain and its password, is ignored by Git, and is never copied into the app bundle. Changing or losing that certificate changes the app's signing identity and may make macOS ask for permissions again. The public preview is self-signed and unnotarized; Developer ID signing and notarization would give users a smoother installation.
 
 Keep the same `com.talktype.mac` bundle identifier and app location across updates. macOS controls privacy permissions, so signing with the same certificate helps maintain identity but cannot guarantee that the system never asks again.
 
@@ -34,12 +36,8 @@ For compatibility across apps, TalkType uses Paste to update the focused field. 
 
 ## Public release
 
-Sparkle 2.9.6 is embedded in the app. Its EdDSA public key is in `Resources/Info.plist`; the private update-signing key is stored in the macOS Keychain under the `TalkType-MacLabb` account, with a local backup in the ignored `.signing/Sparkle-ed25519.key`. Back up `.signing` securely before releasing an update. To enable update checks in a release build, provide a publicly reachable HTTPS appcast URL:
+Sparkle 2.10.0 is embedded in the app. Its EdDSA public key is in `Resources/Info.plist`; the private update-signing key is stored in the macOS Keychain under the `TalkType-MacLabb` account, with a local backup in the ignored `.signing/Sparkle-ed25519.key`. Back up `.signing` securely before releasing an update. The app reads [appcast.xml](appcast.xml) on `main` for update information. Users can check manually or control automatic checks in Settings.
 
-```sh
-TALKTYPE_UPDATE_FEED_URL=https://example.com/appcast.xml ./scripts/build-app.sh
-```
+Run `./scripts/release.sh` to build the signed app, create the ZIP, SHA-256 checksum, and signed Sparkle appcast entry. Publish the exact ZIP and checksum in the matching GitHub release first, then push `appcast.xml` to `main`. Do not edit the ZIP after generating the appcast signature.
 
-When no feed URL is configured, TalkType leaves Sparkle inactive and explains this in Settings. Once the first signed release and appcast are published, the app will check automatically and offer a manual **Check for Updates…** action. Generate the appcast from signed update archives with Sparkle's `generate_appcast --account TalkType-MacLabb`, and publish that XML at the configured URL.
-
-Before publishing a downloadable GitHub release, choose a project license, complete hands-on app checks, and replace the local self-signed identity with Developer ID signing and notarization. Keep the bundle identifier and signing identity consistent between releases so macOS can recognize the app across updates.
+This preview follows the local signing approach used by TabGlide. It is not Apple notarized, so macOS may require manual approval in Privacy & Security after downloading. Keep the same bundle identifier, local certificate, and Sparkle key for later releases. Developer ID signing and notarization remain the path to a smoother public installation.

@@ -203,7 +203,6 @@ import Speech
                 self.pendingText = nil
                 do {
                     try await self.injector?.update(next)
-                    if self.pendingText == nil { self.liveText = self.injector?.insertedText ?? next }
                 } catch { self.fail(error); break }
             }
             self.flushTask = nil
