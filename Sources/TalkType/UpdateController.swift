@@ -5,8 +5,10 @@ import Sparkle
     static let shared = UpdateController()
 
     @Published private(set) var canCheckForUpdates = false
+    @Published private(set) var automaticallyChecksForUpdates = false
     private let controller: SPUStandardUpdaterController?
     private var canCheckObservation: NSKeyValueObservation?
+    private var automaticChecksObservation: NSKeyValueObservation?
 
     private init() {
         let info = Bundle.main.infoDictionary ?? [:]
@@ -17,7 +19,6 @@ import Sparkle
             controller = nil
             return
         }
-
         let updaterController = SPUStandardUpdaterController(
             startingUpdater: true,
             updaterDelegate: nil,
@@ -32,6 +33,14 @@ import Sparkle
                 self?.canCheckForUpdates = updater.canCheckForUpdates
             }
         }
+        automaticChecksObservation = updaterController.updater.observe(
+            \.automaticallyChecksForUpdates,
+            options: [.initial, .new]
+        ) { [weak self] updater, _ in
+            Task { @MainActor in
+                self?.automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
+            }
+        }
     }
 
     var isConfigured: Bool { controller != nil }
@@ -39,5 +48,9 @@ import Sparkle
     func checkForUpdates() {
         guard canCheckForUpdates else { return }
         controller?.checkForUpdates(nil)
+    }
+
+    func setAutomaticChecks(_ enabled: Bool) {
+        controller?.updater.automaticallyChecksForUpdates = enabled
     }
 }

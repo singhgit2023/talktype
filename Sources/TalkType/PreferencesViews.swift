@@ -61,6 +61,11 @@ struct SettingsView: View {
                     Toggle("Launch at login", isOn: Binding(get: { model.launchAtLogin }, set: { model.setLaunchAtLogin($0) }))
                 }
                 Section("Updates") {
+                    Toggle("Check automatically", isOn: Binding(
+                        get: { updates.automaticallyChecksForUpdates },
+                        set: { updates.setAutomaticChecks($0) }
+                    ))
+                    .disabled(!updates.isConfigured)
                     Button("Check for Updates…") { updates.checkForUpdates() }
                         .disabled(!updates.canCheckForUpdates)
                     if !updates.isConfigured {
