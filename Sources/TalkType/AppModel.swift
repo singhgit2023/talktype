@@ -161,10 +161,10 @@ import Speech
 
         let transcriber = SpeechTranscriber()
         transcriber.onText = { [weak self] text in
-            Task { @MainActor in self?.receivePartial(text) }
+            MainActor.assumeIsolated { self?.receivePartial(text) }
         }
         transcriber.onLevel = { [weak self] level in
-            Task { @MainActor in self?.audioLevel = level }
+            MainActor.assumeIsolated { self?.audioLevel = level }
         }
         transcriber.onComplete = { [weak self] result in
             Task { @MainActor in await self?.completeRecording(result) }

@@ -2,7 +2,7 @@
 
 TalkType is a small native macOS menu bar app for voice typing. It recognizes speech on the Mac, formats text locally, and updates the focused text field as words arrive.
 
-[Download TalkType 0.3.0 for Apple Silicon](https://github.com/singhgit2023/talktype/releases/tag/v0.3.0)
+[Download TalkType 0.3.1 for Apple Silicon](https://github.com/singhgit2023/talktype/releases/tag/v0.3.1)
 
 ## Build and open
 
