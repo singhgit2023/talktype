@@ -34,7 +34,7 @@ For compatibility across apps, TalkType uses Paste to update the focused field. 
 
 ## Public release
 
-Sparkle 2.9.6 is embedded in the app. Its EdDSA public key is in `Resources/Info.plist`; the private update-signing key is stored in the macOS Keychain under the `TalkType-MacLabb` account. Back up that private key securely before releasing an update. To enable update checks in a release build, provide a publicly reachable HTTPS appcast URL:
+Sparkle 2.9.6 is embedded in the app. Its EdDSA public key is in `Resources/Info.plist`; the private update-signing key is stored in the macOS Keychain under the `TalkType-MacLabb` account, with a local backup in the ignored `.signing/Sparkle-ed25519.key`. Back up `.signing` securely before releasing an update. To enable update checks in a release build, provide a publicly reachable HTTPS appcast URL:
 
 ```sh
 TALKTYPE_UPDATE_FEED_URL=https://example.com/appcast.xml ./scripts/build-app.sh
