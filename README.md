@@ -1,8 +1,8 @@
 # TalkType
 
-TalkType is a small native macOS menu bar app for voice typing. It recognizes speech on the Mac, formats text locally, and updates the focused text field as words arrive.
+TalkType is a small native macOS menu bar app for voice typing. It recognizes speech on the Mac, formats text locally, and inserts the transcript into the focused text field when recording ends.
 
-[Download TalkType 0.3.1 for Apple Silicon](https://github.com/singhgit2023/talktype/releases/tag/v0.3.1)
+[Download TalkType 0.3.2 for Apple Silicon](https://github.com/singhgit2023/talktype/releases/tag/v0.3.2)
 
 ## Build and open
 
@@ -21,18 +21,18 @@ Keep the same `com.talktype.mac` bundle identifier and app location across updat
 
 The welcome guide appears by itself on first launch. It explains the menu bar companion, lets you record a custom hold shortcut, offers seven appearance themes, and guides you through Microphone, Speech Recognition, and Accessibility permissions. Settings opens after you finish the guide. You can reopen it from Settings later.
 
-The small white mascot with eyes and sound-wave marks appears in the macOS menu bar. Click it for the compact popover, Settings, the floating companion, and Quit. TalkType has no Dock icon.
+The small white mascot with eyes and sound-wave marks appears in the macOS menu bar. Click it for microphone status, Settings, and Quit. TalkType has no Dock icon.
 The same mascot is the app's Finder icon. Run `zsh scripts/make-icon.sh` to regenerate it from the included drawing source.
 
 ## Use
 
-Put the cursor in a text field and hold your configured shortcut. The default is **⌃ ⌘**. Dictation appears in the focused field as recognition updates arrive. Release the keys to finish. You can also start and stop with the menu bar button. A custom shortcut can be a modifier pair or modifiers with a key.
+Put the cursor in a text field and hold your configured shortcut. The default is **⌃ ⌘**. TalkType previews the words in its floating companion while you speak. Release the keys to finish and insert the formatted transcript into the focused field. A custom shortcut can be a modifier pair or modifiers with a key.
 
 The compact floating companion puts the mascot and latest spoken words on one line, with the responsive waveform at the right edge. New words appear from left to right; the line scrolls only after filling the available width. Drag anywhere on the bar to move it; it remembers that position. The bar fades away after recording finishes. Dictation keeps listening through natural pauses while the shortcut is held, recovers from temporary recognition interruptions, and keeps earlier words when recognition starts a new phrase. Settings offers Cream, White, Blush, Mint, Lilac, Sky, and Midnight themes, transcript size, companion animations, and a toggle for the gentle start and finish sounds.
 
 TalkType understands “new line,” “new paragraph,” “delete last word,” “bullet point,” and spoken punctuation such as “comma” and “period.” Recognition requires that macOS supports on-device recognition for the selected language.
 
-For compatibility across apps, TalkType uses Paste to update the focused field. It temporarily writes dictated updates to the clipboard and restores previous clipboard contents on completion if no other app changed them.
+For compatibility across apps, TalkType uses Paste to insert the completed transcript once. It temporarily writes the transcript to the clipboard and restores previous clipboard contents on completion if no other app changed them.
 
 ## Public release
 

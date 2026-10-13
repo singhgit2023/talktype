@@ -12,7 +12,7 @@ import SwiftUI
         if let button = item.button {
             button.image = Self.mascotIcon()
             button.imagePosition = .imageOnly
-            button.toolTip = "TalkType — click for settings and voice typing"
+            button.toolTip = "TalkType — microphone status and settings"
             button.setAccessibilityLabel("TalkType menu")
             button.target = self
             button.action = #selector(togglePopover)

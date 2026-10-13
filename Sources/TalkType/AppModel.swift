@@ -50,8 +50,6 @@ import Speech
     private let soundCues = SoundCues()
     private var transcriber: SpeechTranscriber?
     private var injector: LiveTextInjector?
-    private var pendingText: String?
-    private var flushTask: Task<Void, Never>?
     private var acceptsPartials = false
     private var shortcutIsHeld = false
     private var recordingMode: RecordingMode = .button
@@ -195,29 +193,15 @@ import Speech
         guard acceptsPartials, phase == .listening || phase == .finishing else { return }
         let formatted = DictationFormatter.format(transcript, enabled: automaticFormatting, finalize: false)
         if !formatted.isEmpty { liveText = formatted }
-        pendingText = formatted
-        guard flushTask == nil else { return }
-        flushTask = Task { [weak self] in
-            guard let self else { return }
-            while let next = self.pendingText {
-                self.pendingText = nil
-                do {
-                    try await self.injector?.update(next)
-                } catch { self.fail(error); break }
-            }
-            self.flushTask = nil
-        }
     }
 
     private func completeRecording(_ result: Result<String, Error>) async {
         guard phase == .listening || phase == .finishing else { return }
         acceptsPartials = false
-        pendingText = nil
         transcriber = nil
-        await flushTask?.value
-        guard phase == .listening || phase == .finishing else { return }
         switch result {
         case .success(let transcript):
+            guard phase == .finishing else { fail(TalkTypeError.recognitionUnavailable); return }
             let text = DictationFormatter.format(transcript, enabled: automaticFormatting)
             guard !text.isEmpty else { injector?.finish(); injector = nil; fail(TalkTypeError.noSpeech); return }
             do {
@@ -226,7 +210,7 @@ import Speech
                 injector?.finish()
                 injector = nil
                 phase = .success
-                message = "Typed as you spoke!"
+                message = "Transcript inserted!"
                 liveText = displayedText
                 listeningPanel.hide(after: 0.8)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
@@ -244,7 +228,6 @@ import Speech
 
     private func fail(_ error: Error) {
         acceptsPartials = false
-        pendingText = nil
         transcriber?.cancel()
         transcriber = nil
         injector?.finish()

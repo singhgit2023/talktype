@@ -118,7 +118,7 @@ struct OnboardingView: View {
                 .foregroundStyle(SoftUI.ink)
             Text([
                 "A little Mac companion that types your words wherever your cursor is. I live in your menu bar and stay out of the way.",
-                "Record a shortcut you can comfortably hold. Your words appear as you speak; release the keys to finish.",
+                "Record a shortcut you can comfortably hold. Preview your words as you speak; release the keys to insert the transcript.",
                 "Drag the floating companion anywhere on screen. Choose the style and text size that feel comfortable.",
                 "Allow these three permissions so TalkType can listen, recognize speech, and type into your apps."
             ][page])
